@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Heaven's Calculator | Ethereal Arithmetic</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 30%, #0b2b3b, #071a24);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* celestial animated particles (stars) */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(2px 2px at 20px 40px, #fff, rgba(0,0,0,0)),
+                        radial-gradient(1px 1px at 70px 150px, #ffefb0, rgba(0,0,0,0)),
+                        radial-gradient(2px 1px at 110px 220px, #ffe0c0, rgba(0,0,0,0)),
+                        radial-gradient(1px 2px at 280px 80px, #f8f0dc, rgba(0,0,0,0));
+      background-repeat: no-repeat;
+      background-size: 200px 200px, 300px 300px, 400px 400px, 250px 250px;
+      opacity: 0.5;
+      pointer-events: none;
+      animation: twinkle 8s infinite alternate;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.8; }
+    }
+
+    /* main calculator card */
+    .calculator {
+      max-width: 500px;
+      width: 100%;
+      background: rgba(255, 248, 235, 0.2);
+      backdrop-filter: blur(18px);
+      border-radius: 3rem;
+      padding: 1.5rem;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 245, 210, 0.3), 0 0 20px rgba(255, 215, 150, 0.4);
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 245, 200, 0.5);
+    }
+
+    /* header with ethereal title */
+    .title {
+      text-align: center;
+      margin-bottom: 1.2rem;
+      letter-spacing: 1px;
+      position: relative;
+    }
+
+    .title h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #FFF9E6, #FFE5B4, #FFD89A);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      display: inline-block;
+      padding: 0 0.5rem;
+    }
+
+    .title h1::before {
+      content: "✧";
+      font-size: 1.8rem;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      color: #FFE1A0;
+      text-shadow: 0 0 4px #ffc978;
+      margin-right: 10px;
+      display: inline-block;
+    }
+
+    .title h1::after {
+      content: "✧";
+      font-size: 1.8rem;
+      background: none;
+      -webkit-background-clip: unset;
+      color: #FFE1A0;
+      text-shadow: 0 0 4px #ffc978;
+      margin-left: 10px;
+      display: inline-block;
+    }
+
+    /* display area - heavenly glow */
+    .display {
+      background: rgba(10, 25, 35, 0.6);
+      backdrop-filter: blur(4px);
+      border-radius: 2rem;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.8rem;
+      text-align: right;
+      border: 1px solid rgba(255, 235, 170, 0.6);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s;
+    }
+
+    .previous-operand {
+      min-height: 1.8rem;
+      font-size: 1.1rem;
+      color: #ffefcf;
+      letter-spacing: 1px;
+      word-break: break-word;
+      opacity: 0.9;
+      font-weight: 400;
+      text-shadow: 0 0 2px rgba(0,0,0,0.3);
+    }
+
+    .current-operand {
+      font-size: 2.8rem;
+      font-weight: 500;
+      color: #FFF5E6;
+      word-break: break-word;
+      line-height: 1.2;
+      text-shadow: 0 0 6px rgba(255, 200, 100, 0.5);
+      letter-spacing: 1px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: thin;
+    }
+
+    /* button grid - celestial layout */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.8rem;
+    }
+
+    button {
+      background: rgba(255, 245, 225, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 235, 180, 0.6);
+      border-radius: 2rem;
+      padding: 1rem 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #FFF9EE;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button:active {
+      transform: scale(0.96);
+      background: rgba(255, 230, 170, 0.3);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* special button styles */
+    .operator {
+      background: rgba(230, 170, 80, 0.35);
+      border-color: #ffdfaa;
+      color: #FFF2CF;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .equals {
+      background: linear-gradient(145deg, #e6b46e, #cf9f55);
+      border-color: #ffeaac;
+      color: #211c12;
+      font-weight: bold;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 1px 0 #ffdfaa;
+    }
+
+    .equals:active {
+      background: #b8843a;
+      transform: scale(0.96);
+    }
+
+    .clear-btn {
+      background: rgba(180, 100, 80, 0.45);
+      color: #fff1e0;
+      border-color: #ffcf9a;
+    }
+
+    .function-btn {
+      background: rgba(120, 150, 170, 0.45);
+      color: #faf0db;
+    }
+
+    /* zero button spans two columns on small? but layout looks balanced */
+    .span-two {
+      grid-column: span 2;
+    }
+
+    /* tooltip/hover effect */
+    button:hover {
+      background: rgba(255, 235, 185, 0.35);
+      border-color: #ffefc0;
+      box-shadow: 0 0 10px rgba(255, 220, 120, 0.5);
+    }
+
+    /* Responsive design */
+    @media (max-width: 480px) {
+      .calculator {
+        padding: 1rem;
+      }
+      .buttons {
+        gap: 0.6rem;
+      }
+      button {
+        padding: 0.7rem 0;
+        font-size: 1.3rem;
+      }
+      .current-operand {
+        font-size: 2rem;
+      }
+      .title h1 {
+        font-size: 1.5rem;
+      }
+      .title h1::before, .title h1::after {
+        font-size: 1.3rem;
+      }
+    }
+
+    /* custom scroll for display */
+    .current-operand::-webkit-scrollbar {
+      height: 3px;
+    }
+    .current-operand::-webkit-scrollbar-track {
+      background: rgba(255,255,210,0.2);
+      border-radius: 10px;
+    }
+    .current-operand::-webkit-scrollbar-thumb {
+      background: #ffd98c;
+      border-radius: 10px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 1.4rem;
+      font-size: 0.7rem;
+      color: #c7bba4;
+      opacity: 0.8;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+<div class="calculator">
+  <div class="title">
+    <h1>Heaven's Calculator</h1>
+  </div>
+  <div class="display">
+    <div class="previous-operand" id="previousOperandDisplay"></div>
+    <div class="current-operand" id="currentOperandDisplay">0</div>
+  </div>
+  <div class="buttons">
+    <!-- Row 1: AC, ±, %, ⌫ (backspace) -->
+    <button class="clear-btn function-btn" data-action="clear">AC</button>
+    <button class="function-btn" data-action="sign">±</button>
+    <button class="function-btn" data-action="percent">%</button>
+    <button class="function-btn" data-action="backspace">⌫</button>
+
+    <!-- Row 2: 7 8 9 ÷ -->
+    <button data-number="7">7</button>
+    <button data-number="8">8</button>
+    <button data-number="9">9</button>
+    <button class="operator" data-operation="÷">÷</button>
+
+    <!-- Row 3: 4 5 6 × -->
+    <button data-number="4">4</button>
+    <button data-number="5">5</button>
+    <button data-number="6">6</button>
+    <button class="operator" data-operation="×">×</button>
+
+    <!-- Row 4: 1 2 3 - -->
+    <button data-number="1">1</button>
+    <button data-number="2">2</button>
+    <button data-number="3">3</button>
+    <button class="operator" data-operation="-">-</button>
+
+    <!-- Row 5: 0 . = + -->
+    <button data-number="0" class="span-two" style="grid-column: span 1;">0</button>
+    <button data-number=".">.</button>
+    <button class="equals" data-action="equals">=</button>
+    <button class="operator" data-operation="+">+</button>
+  </div>
+  <footer>✦ celestial arithmetic ✦</footer>
+</div>
+
+<script>
+  // ---------- Heaven's Calculator Core Logic ----------
+  let currentOperand = '0';      // string shown on main display
+  let previousOperand = null;    // stored first operand
+  let operation = null;          // current operator: '+', '-', '×', '÷'
+  let waitingForNewOperand = false;   // after operator, next number overwrites current
+  let errorFlag = false;          // to handle division by zero or calculation errors
+
+  // DOM elements
+  const previousOperandElement = document.getElementById('previousOperandDisplay');
+  const currentOperandElement = document.getElementById('currentOperandDisplay');
+
+  // Helper: update the UI displays
+  function updateDisplay() {
+    // Format previous operand with operation symbol
+    if (previousOperand !== null && operation !== null) {
+      let prevFormatted = formatDisplayNumber(previousOperand);
+      previousOperandElement.textContent = `${prevFormatted} ${getOperatorSymbol(operation)}`;
+    } else {
+      previousOperandElement.textContent = '';
+    }
+
+    // Show current operand (trim if too long)
+    let currentFormatted = formatDisplayNumber(currentOperand);
+    currentOperandElement.textContent = currentFormatted === '' ? '0' : currentFormatted;
+  }
+
+  // Format number for display: avoid scientific, cut long decimals
+  function formatDisplayNumber(value) {
+    if (value === null || value === undefined) return '';
+    if (value === 'Error') return 'ERROR';
+    let num = parseFloat(value);
+    if (isNaN(num)) return value.toString();
+
+    // If integer, just return integer
+    if (Number.isInteger(num)) return num.toString();
+
+    // Limit decimal places to 8, remove trailing zeros
+    let fixed = num.toFixed(8);
+    let trimmed = fixed.replace(/\.?0+$/, '');
+    // prevent "0." -> "0"
+    if (trimmed.endsWith('.')) trimmed = trimmed.slice(0, -1);
+    // if trimmed becomes empty or "-0", fix edge
+    if (trimmed === '' || trimmed === '-0') return '0';
+    // limit overall length (max 14 characters)
+    if (trimmed.length > 16) {
+      return parseFloat(num).toExponential(6);
+    }
+    return trimmed;
+  }
+
+  // get symbol from internal operation
+  function getOperatorSymbol(op) {
+    if (op === '+') return '+';
+    if (op === '-') return '-';
+    if (op === '×') return '×';
+    if (op === '÷') return '÷';
+    return '';
+  }
+
+  // Perform calculation based on previous operand, current operand, and operation
+  function compute() {
+    if (previousOperand === null || operation === null || currentOperand === null) return null;
+    const prev = parseFloat(previousOperand);
+    const curr = parseFloat(currentOperand);
+    if (isNaN(prev) || isNaN(curr)) return null;
+
+    let result;
+    switch (operation) {
+      case '+':
+        result = prev + curr;
+        break;
+      case '-':
+        result = prev - curr;
+        break;
+      case '×':
+        result = prev * curr;
+        break;
+      case '÷':
+        if (curr === 0) return 'Error';
+        result = prev / curr;
+        break;
+      default:
+        return null;
+    }
+    // Handle floating precision edge: round to 10 decimals
+    if (typeof result === 'number') {
+      result = parseFloat(result.toFixed(10));
+    }
+    return result.toString();
+  }
+
+  // set result after compute, update states
+  function setResult(value) {
+    if (value === 'Error') {
+      currentOperand = 'Error';
+      previousOperand = null;
+      operation = null;
+      waitingForNewOperand = true;
+      errorFlag = true;
+      updateDisplay();
+      return;
+    }
+    // Convert number to string without scientific notation
+    let numeric = parseFloat(value);
+    if (isNaN(numeric)) {
+      currentOperand = 'Error';
+      errorFlag = true;
+    } else {
+      currentOperand = numeric.toString();
+    }
+    previousOperand = null;
+    operation = null;
+    waitingForNewOperand = true;   // next number will start fresh
+    errorFlag = false;
+    updateDisplay();
+  }
+
+  // Clear everything
+  function allClear() {
+    currentOperand = '0';
+    previousOperand = null;
+    operation = null;
+    waitingForNewOperand = false;
+    errorFlag = false;
+    updateDisplay();
+  }
+
+  // Backspace: delete last character from currentOperand
+  function backspace() {
+    if (errorFlag) {
+      allClear();
+      return;
+    }
+    if (waitingForNewOperand) return; // nothing to delete if waiting for new number after operation
+    if (currentOperand.length === 1 || (currentOperand.length === 2 && currentOperand.startsWith('-'))) {
+      currentOperand = '0';
+    } else {
+      currentOperand = currentOperand.slice(0, -1);
+      if (currentOperand === '' || currentOperand === '-') currentOperand = '0';
+    }
+    updateDisplay();
+  }
+
+  // toggle sign (+/-)
+  function toggleSign() {
+    if (errorFlag) {
+      allClear();
+      return;
+    }
+    if (waitingForNewOperand) {
+      // if waiting for operand, we can still flip fresh value
+      currentOperand = '0';
+      waitingForNewOperand = false;
+    }
+    let num = parseFloat(currentOperand);
+    if (isNaN(num)) {
+      currentOperand = '0';
+      num = 0;
+    }
+    num = -num;
+    currentOperand = num.toString();
+    updateDisplay();
+  }
+
+  // Percentage: convert current value to percentage (divide by 100)
+  function percentOperation() {
+    if (errorFlag) {
+      allClear();
+      return;
+    }
+    if (waitingForNewOperand) {
+      currentOperand = '0';
+      waitingForNewOperand = false;
+    }
+    let num = parseFloat(currentOperand);
+    if (isNaN(num)) num = 0;
+    num = num / 100;
+    currentOperand = num.toString();
+    updateDisplay();
+  }
+
+  // Append number (digit) to current operand
+  function appendNumber(number) {
+    if (errorFlag) {
+      allClear();
+    }
+    // if waiting for new operand (after operator), replace current operand
+    if (waitingForNewOperand) {
+      currentOperand = number;
+      waitingForNewOperand = false;
+      updateDisplay();
+      return;
+    }
+
+    // prevent multiple leading zeros
+    if (currentOperand === '0' && number !== '.') {
+      currentOperand = number;
+    } else {
+      // avoid too long numbers (max 16 chars)
+      if (currentOperand.replace(/\./g, '').length >= 16) return;
+      currentOperand += number;
+    }
+    updateDisplay();
+  }
+
+  // add decimal point
+  function appendDecimal() {
+    if (errorFlag) {
+      allClear();
+    }
+    if (waitingForNewOperand) {
+      currentOperand = '0.';
+      waitingForNewOperand = false;
+      updateDisplay();
+      return;
+    }
+    // if already has dot, ignore
+    if (currentOperand.includes('.')) return;
+    // if empty or zero, add '0.'
+    if (currentOperand === '' || currentOperand === '0') {
+      currentOperand = '0.';
+    } else {
+      currentOperand += '.';
+    }
+    updateDisplay();
+  }
+
+  // handle operator clicks (+, -, ×, ÷)
+  function handleOperator(op) {
+    if (errorFlag) {
+      allClear();
+    }
+
+    // If we have a pending operation and we are NOT waiting for new operand => compute first
+    if (previousOperand !== null && operation !== null && !waitingForNewOperand) {
+      const result = compute();
+      if (result === 'Error') {
+        setResult('Error');
+        // after error, reset operation state before setting new one
+        previousOperand = null;
+        operation = null;
+        waitingForNewOperand = false;
+        errorFlag = true;
+        updateDisplay();
+        // set new operation after error? we should not proceed with new op after error
+        return;
+      } else {
+        // set result as previous operand for chain calculation
+        previousOperand = result;
+        currentOperand = result;
+        operation = op;           // new operation
+        waitingForNewOperand = true;
+        updateDisplay();
+        return;
+      }
+    }
+
+    // If no previous operand, set current operand as previous and store operation
+    if (previousOperand === null) {
+      if (currentOperand !== 'Error') {
+        previousOperand = currentOperand;
+        operation = op;
+        waitingForNewOperand = true;
+        updateDisplay();
+      }
+      return;
+    }
+
+    // If waitingForNewOperand but operation already exists, just replace the operator
+    if (waitingForNewOperand && previousOperand !== null) {
+      operation = op;
+      updateDisplay();
+      return;
+    }
+  }
+
+  // equals: evaluate the expression
+  function evaluate() {
+    if (errorFlag) {
+      allClear();
+      return;
+    }
+    if (previousOperand !== null && operation !== null && !waitingForNewOperand) {
+      const result = compute();
+      if (result === 'Error') {
+        setResult('Error');
+      } else {
+        setResult(result);
+      }
+    } else {
+      // if nothing to compute, just update display (do nothing)
+      updateDisplay();
+    }
+  }
+
+  // helper: map operation symbols to internal codes
+  function mapOperator(inputOp) {
+    if (inputOp === '+' || inputOp === '-') return inputOp;
+    if (inputOp === '×' || inputOp === '*') return '×';
+    if (inputOp === '÷' || inputOp === '/') return '÷';
+    return inputOp;
+  }
+
+  // ---------- Event Binding (Buttons & Keyboard) ----------
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // number button
+      if (btn.hasAttribute('data-number')) {
+        const num = btn.getAttribute('data-number');
+        if (num === '.') appendDecimal();
+        else appendNumber(num);
+      }
+      // operation
+      else if (btn.hasAttribute('data-operation')) {
+        const op = btn.getAttribute('data-operation');
+        handleOperator(mapOperator(op));
+      }
+      // action: clear, sign, percent, backspace, equals
+      else if (btn.hasAttribute('data-action')) {
+        const action = btn.getAttribute('data-action');
+        switch (action) {
+          case 'clear':
+            allClear();
+            break;
+          case 'sign':
+            toggleSign();
+            break;
+          case 'percent':
+            percentOperation();
+            break;
+          case 'backspace':
+            backspace();
+            break;
+          case 'equals':
+            evaluate();
+            break;
+          default: break;
+        }
+      }
+    });
+  });
+
+  // Keyboard support for heavenly productivity
+  window.addEventListener('keydown', (e) => {
+    const key = e.key;
+    // Prevent accidental page reloads or scrolling on space etc.
+    if (key === ' ' || key === 'Enter' || key === 'Escape' || key === 'Backspace' ||
+        /^[0-9]$/.test(key) || key === '.' || key === '+' || key === '-' || key === '*' || key === '/' || key === '%') {
+      e.preventDefault();
+    }
+
+    // Numbers & decimal
+    if (/^[0-9]$/.test(key)) {
+      appendNumber(key);
+    } else if (key === '.') {
+      appendDecimal();
+    }
+    // Operators
+    else if (key === '+') {
+      handleOperator('+');
+    } else if (key === '-') {
+      handleOperator('-');
+    } else if (key === '*') {
+      handleOperator('×');
+    } else if (key === '/') {
+      handleOperator('÷');
+    }
+    // Enter or = for equals
+    else if (key === 'Enter' || key === '=') {
+      evaluate();
+    }
+    // Backspace
+    else if (key === 'Backspace') {
+      backspace();
+    }
+    // Escape clears all
+    else if (key === 'Escape') {
+      allClear();
+    }
+    // percentage
+    else if (key === '%') {
+      percentOperation();
+    }
+    // optional shift toggle sign? not necessary but nice: 's' for sign
+    else if (key === 's' || key === 'S') {
+      toggleSign();
+    }
+  });
+
+  // initial display update
+  updateDisplay();
+</script>
+</body>
+</html>
